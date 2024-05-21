@@ -1,19 +1,6 @@
 import os 
-import tensorflow as tf
-from keras import Sequential 
-from keras.layers import Conv3D, LSTM, Dense, Dropout, Bidirectional, MaxPool3D, Activation, Reshape, SpatialDropout3D, BatchNormalization, TimeDistributed, Flatten
-from keras.optimizers.legacy import Adam
-
-def CTCLoss(y_true, y_pred):
-    batch_len = tf.cast(tf.shape(y_true)[0], dtype="int64")
-    input_length = tf.cast(tf.shape(y_pred)[1], dtype="int64")
-    label_length = tf.cast(tf.shape(y_true)[1], dtype="int64")
-
-    input_length = input_length * tf.ones(shape=(batch_len, 1), dtype="int64")
-    label_length = label_length * tf.ones(shape=(batch_len, 1), dtype="int64")
-
-    loss = tf.keras.backend.ctc_batch_cost(y_true, y_pred, input_length, label_length)
-    return loss
+from tensorflow.keras.models import Sequential 
+from tensorflow.keras.layers import Conv3D, LSTM, Dense, Dropout, Bidirectional, MaxPool3D, Activation, Reshape, SpatialDropout3D, BatchNormalization, TimeDistributed, Flatten
 
 def load_model() -> Sequential: 
     model = Sequential()
@@ -32,16 +19,14 @@ def load_model() -> Sequential:
 
     model.add(TimeDistributed(Flatten()))
 
-    model.add(Bidirectional(LSTM(128, kernel_initializer='Orthogonal', return_sequences=True)))
+    model.add(Bidirectional(LSTM(128, kernel_initializer='orthogonal', return_sequences=True)))
     model.add(Dropout(.5))
 
-    model.add(Bidirectional(LSTM(128, kernel_initializer='Orthogonal', return_sequences=True)))
+    model.add(Bidirectional(LSTM(128, kernel_initializer='orthogonal', return_sequences=True)))
     model.add(Dropout(.5))
 
     model.add(Dense(41, kernel_initializer='he_normal', activation='softmax'))
 
-    model.compile(optimizer=Adam(learning_rate=0.0001), loss=CTCLoss)
-    
-    model.load_weights(os.path.join('app', 'models', 'checkpoint'))
+    model.load_weights(os.path.join('..','models','checkpoint'))
 
     return model
