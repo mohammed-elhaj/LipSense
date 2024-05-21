@@ -2,31 +2,16 @@ import tensorflow as tf
 from typing import List
 import cv2
 import os 
-import tempfile
-import shutil
-import subprocess
-from moviepy.editor import VideoFileClip
-from io import BytesIO
 
 vocab = [x for x in "abcdefghijklmnopqrstuvwxyz'?!123456789 "]
 char_to_num = tf.keras.layers.StringLookup(vocabulary=vocab, oov_token="")
+# Mapping integers back to original characters
 num_to_char = tf.keras.layers.StringLookup(
     vocabulary=char_to_num.get_vocabulary(), oov_token="", invert=True
 )
 
-def convert_to_mp4(video_path):
-    clip = VideoFileClip(video_path)
-    fps = 30  # Set a constant value for fps
-
-    video_clip = clip.set_duration(clip.duration).set_fps(fps)
-    audio_clip = clip.audio.set_duration(clip.duration).set_fps(fps)
-
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_file:
-        temp_filename = temp_file.name
-        video_clip.set_audio(audio_clip).write_videofile(temp_filename, codec='libx264', audio_codec='aac', fps=fps)
-        return temp_filename
-
 def load_video(path:str) -> List[float]: 
+    #print(path)
     cap = cv2.VideoCapture(path)
     frames = []
     for _ in range(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))): 
@@ -40,6 +25,7 @@ def load_video(path:str) -> List[float]:
     return tf.cast((frames - mean), tf.float32) / std
     
 def load_alignments(path:str) -> List[str]: 
+    #print(path)
     with open(path, 'r') as f: 
         lines = f.readlines() 
     tokens = []
@@ -51,11 +37,16 @@ def load_alignments(path:str) -> List[str]:
 
 def load_data(path: str): 
     path = bytes.decode(path.numpy())
-    
-    file_name = os.path.splitext(os.path.basename(path))[0]
+    file_name = path.split('/')[-1].split('.')[0]
+    # File name splitting for windows
+    #file_name = path.split('\\')[-1].split('.')[0]
+    #video_path = os.path.join('..','data','s1',f'{file_name}.mpg')
+    #alignment_path = os.path.join('..','data','alignments','s1',f'{file_name}.align')
 
-    video_path = os.path.join('app', 'data', 's1', f'{file_name}.mpg')
-    alignment_path = os.path.join('app', 'data', 'alignments', 's1', f'{file_name}.align')
+    script_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
+    video_path = os.path.join(script_dir, '..', 'data', 's1', f'{file_name}.mpg')
+    alignment_path = os.path.join(script_dir, '..', 'data', 'alignments', 's1', f'{file_name}.align')
+    
     frames = load_video(video_path) 
     alignments = load_alignments(alignment_path)
     
