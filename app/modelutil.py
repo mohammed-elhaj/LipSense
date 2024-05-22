@@ -29,7 +29,7 @@ def load_model() -> Sequential:
 
     #model.load_weights(os.path.join('models', 'checkpoint'), by_name=True, skip_mismatch=True)
 
-    script_dir = os.path.dirname(os.path.abspath(file))  # Get the directory of the current script
+    script_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
     file_path = os.path.join(script_dir, 'models', 'checkpoint.h5')
     model.load_weights(file_path)
 
