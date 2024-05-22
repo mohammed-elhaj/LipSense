@@ -27,7 +27,11 @@ def load_model() -> Sequential:
 
     model.add(Dense(41, kernel_initializer='he_normal', activation='softmax'))
 
-    model.load_weights(os.path.join('models', 'checkpoint'), by_name=True, skip_mismatch=True)
+    #model.load_weights(os.path.join('models', 'checkpoint'), by_name=True, skip_mismatch=True)
+
+    script_dir = os.path.dirname(os.path.abspath(file))  # Get the directory of the current script
+    file_path = os.path.join(script_dir, 'models', 'checkpoint')
+    model.load_weights(file_path)
 
     #model.load_weights(os.path.join('..','models','checkpoint'))
 
