@@ -27,19 +27,22 @@ def load_model() -> Sequential:
 
     model.add(Dense(41, kernel_initializer='he_normal', activation='softmax'))
 
+    model.load_weights(os.path.join('..','models','checkpoint'), by_name=True, skip_mismatch=True)
+
+
     #model.load_weights(os.path.join('..','models','checkpoint'))
 
-    # Ensure the checkpoint directory is correctly set relative to the script's execution directory
-    checkpoint_dir = os.path.join('..', 'models')
+    # # Ensure the checkpoint directory is correctly set relative to the script's execution directory
+    # checkpoint_dir = os.path.join('..', 'models')
 
-    # Create a checkpoint instance that points to the folder where the checkpoints are saved
-    checkpoint = tf.train.Checkpoint(model=model)
+    # # Create a checkpoint instance that points to the folder where the checkpoints are saved
+    # checkpoint = tf.train.Checkpoint(model=model)
 
-    # Restore the latest checkpoint
-    latest = tf.train.latest_checkpoint(checkpoint_dir)
-    if latest:
-        checkpoint.restore(latest)
-    else:
-        raise FileNotFoundError(f"No checkpoint found in {checkpoint_dir}")
+    # # Restore the latest checkpoint
+    # latest = tf.train.latest_checkpoint(checkpoint_dir)
+    # if latest:
+    #     checkpoint.restore(latest)
+    # else:
+    #     raise FileNotFoundError(f"No checkpoint found in {checkpoint_dir}")
     
     return model
