@@ -2,10 +2,10 @@
 import streamlit as st
 import os 
 import imageio 
-
 import tensorflow as tf 
 from utils import load_data, num_to_char
 from modelutil import load_model
+import tempfile
 
 # Set the layout to the streamlit app as wide 
 st.set_page_config(layout='wide')
@@ -17,50 +17,52 @@ with st.sidebar:
     st.info('This application is originally developed from the LipNet deep learning model.')
 
 st.title('LipNet Full Stack App') 
-# Generating a list of options or videos 
-options = os.listdir('app/data/s1')
-selected_video = st.selectbox('Choose video', options)
+
+# Add video upload feature
+uploaded_video = st.file_uploader("Upload a video", type=["mp4"])
+
+# Generating a list of options or videos from the app data folder 
+data_options = os.listdir('app/data/s1')
+selected_video = st.selectbox('Or choose a sample video', data_options)
+
+# Use uploaded video if available
+video_path = None
+if uploaded_video:
+    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        tmp_file.write(uploaded_video.read())
+        video_path = tmp_file.name
+else:
+    script_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
+    video_path = os.path.join(script_dir, 'data', 's1', selected_video)
 
 # Generate two columns 
 col1, col2 = st.columns(2)
 
-if options: 
+if video_path: 
 
     # Rendering the video 
     with col1: 
         st.info('The video below displays the converted video in mp4 format')
-        #file_path = os.path.join('..','data','s1', selected_video)
-
-        script_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
-        file_path = os.path.join(script_dir, 'data', 's1', selected_video)
 
         # Path to the output video
         output_file_path = os.path.join(script_dir, 'test_video.mp4')
         
-        os.system(f'ffmpeg -i "{file_path}" -vcodec libx264 "{output_file_path}" -y')
+        os.system(f'ffmpeg -i "{video_path}" -vcodec libx264 "{output_file_path}" -y')
 
         # Rendering inside of the app
-        #video = open('app/test_video.mp4', 'rb') 
-        #video_bytes = video.read() 
-        #st.video(video_bytes)
-
-
-        # Rendering inside of the app gpt 
-        #video_path = os.path.join(script_dir,'test_video.mp4')
         with open(output_file_path, 'rb') as video:
             video_bytes = video.read()
         st.video(video_bytes)
 
-
     with col2: 
         st.info('This is all the machine learning model sees when making a prediction')
-        video, annotations = load_data(tf.convert_to_tensor(file_path))
-        imageio.mimsave('animation.gif', video, fps=10)
+        video_data, annotations = load_data(tf.convert_to_tensor(video_path))
+        imageio.mimsave('animation.gif', video_data, fps=10)
         st.image('animation.gif', width=400) 
 
         st.info('This is the output of the machine learning model as tokens')
         model = load_model()
-        yhat = model.predict(tf.expand_dims(video, axis=0))
+        yhat = model.predict(tf.expand_dims(video_data, axis=0))
         decoder = tf.keras.backend.ctc_decode(yhat, [75], greedy=True)[0][0].numpy()
         st.text(decoder)
 
@@ -69,3 +71,16 @@ if options:
         converted_prediction = tf.strings.reduce_join(num_to_char(decoder)).numpy().decode('utf-8')
         st.text(converted_prediction)
         
+        # Adding model interpretation details
+        st.info('Model confidence scores and other details')
+        # Assuming yhat contains logits, we can apply a softmax to get probabilities
+        confidence_scores = tf.nn.softmax(yhat[0]).numpy()
+        st.bar_chart(confidence_scores)
+
+# Enhancements for user experience and performance
+st.info('Enhancements for better performance and user experience')
+st.markdown("""
+- Upload your own videos for lip reading.
+- See real-time predictions and confidence scores.
+- Improved UI/UX for a seamless experience.
+""")
