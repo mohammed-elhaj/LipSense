@@ -64,7 +64,6 @@ if options:
 
     with col2: 
         st.info('This is all the machine learning model sees when making a prediction')
-        video, annotations = load_data(tf.convert_to_tensor(file_path))
         #imageio.mimsave('animation.gif', video, fps=10)
         #st.image('animation.gif', width=400) 
 
@@ -72,6 +71,7 @@ if options:
        # if get_file_extension(file_path) == 'mp4':
         output_file_path = os.path.join(script_dir, 'test_video.mpg')
         convert_mp4_to_mpg(file_path, output_file_path)
+        video, annotations = load_data(tf.convert_to_tensor(output_file_path))
         model = load_model()
         yhat = model.predict(tf.expand_dims(video, axis=0))
         decoder = tf.keras.backend.ctc_decode(yhat, [75], greedy=True)[0][0].numpy()
