@@ -15,7 +15,7 @@ def load_video(path:str) -> List[float]:
     cap = cv2.VideoCapture(path)
     frames = []
     #for _ in range(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))): 
-    for _ in range(70): 
+    for _ in range(75): 
         ret, frame = cap.read()
         frame = tf.image.rgb_to_grayscale(frame)
         frames.append(frame[190:236,80:220,:])
