@@ -71,17 +71,11 @@ if video_path:
         converted_prediction = tf.strings.reduce_join(num_to_char(decoder)).numpy().decode('utf-8')
         st.text(converted_prediction)
         
-        # Adding model interpretation details
+       # Adding model interpretation details
         st.info('Model confidence scores and other details')
         # Assuming yhat contains logits, we can apply a softmax to get probabilities
         confidence_scores = tf.nn.softmax(yhat[0]).numpy()
-        
-        # Display top-N predictions
-        top_n = 5
-        top_n_indices = confidence_scores.argsort()[-top_n:][::-1]
-        for i in top_n_indices:
-            score = confidence_scores[i]
-            st.write(f"Token {i}: {num_to_char([i])[0].numpy().decode('utf-8')} with confidence {score:.2%}")
+        st.bar_chart(confidence_scores)
 
 # Enhancements for user experience and performance
 st.info('Enhancements for better performance and user experience')
