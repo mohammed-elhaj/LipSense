@@ -59,6 +59,9 @@ if options:
         #st.image('animation.gif', width=400) 
 
         st.info('This is the output of the machine learning model as tokens')
+        output_file_path = os.path.join(script_dir, 'predict.mpg')
+        #os.system(f'ffmpeg -i "{file_path}" -vcodec libx264 "{output_file_path}" -y')
+        os.system(f'ffmpeg -i "{file_path}" -c:v mpeg2video -q:v 5 -c:a mp2 -f vob "{output_file_path}"')
         model = load_model()
         yhat = model.predict(tf.expand_dims(video, axis=0))
         decoder = tf.keras.backend.ctc_decode(yhat, [75], greedy=True)[0][0].numpy()
