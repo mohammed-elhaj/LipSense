@@ -69,8 +69,8 @@ if options:
         #st.image('animation.gif', width=400) 
 
         st.info('This is the output of the machine learning model as tokens')
-        if get_file_extension(file_path) == 'mp4':
-            convert_mp4_to_mpg(file_path, output_file_path)
+       # if get_file_extension(file_path) == 'mp4':
+        convert_mp4_to_mpg(file_path, output_file_path)
         model = load_model()
         yhat = model.predict(tf.expand_dims(video, axis=0))
         decoder = tf.keras.backend.ctc_decode(yhat, [75], greedy=True)[0][0].numpy()
