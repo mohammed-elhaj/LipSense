@@ -2,11 +2,22 @@
 import streamlit as st
 import os 
 import imageio 
-
+import subprocess
 import tensorflow as tf 
 from utils import load_data, num_to_char
 from modelutil import load_model
 
+def get_file_extension(file_path):
+    _, file_extension = os.path.splitext(file_path)
+    return file_extension
+    
+def convert_mp4_to_mpg(input_file, output_file):
+    try:
+        # Run ffmpeg command
+        subprocess.run(['ffmpeg', '-i', input_file, output_file], check=True)
+        print(f"Conversion successful: {output_file}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error during conversion: {e}")
 # Set the layout to the streamlit app as wide 
 st.set_page_config(layout='wide')
 
@@ -59,9 +70,8 @@ if options:
         #st.image('animation.gif', width=400) 
 
         st.info('This is the output of the machine learning model as tokens')
-        output_file_path = os.path.join(script_dir, 'predict.mpg')
-        #os.system(f'ffmpeg -i "{file_path}" -vcodec libx264 "{output_file_path}" -y')
-        os.system(f'ffmpeg -i "{file_path}" -c:v mpeg2video -q:v 5 -c:a mp2 -f vob "{output_file_path}"')
+        if get_file_extension(file_path) == 'mp4':
+            convert_mp4_to_mpg(file_path, output_file_path)
         model = load_model()
         yhat = model.predict(tf.expand_dims(video, axis=0))
         decoder = tf.keras.backend.ctc_decode(yhat, [75], greedy=True)[0][0].numpy()
