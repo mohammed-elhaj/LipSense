@@ -2,7 +2,7 @@
 import streamlit as st
 import os 
 import imageio 
-import subprocess
+from moviepy.editor import VideoFileClip
 import tensorflow as tf 
 from utils import load_data, num_to_char
 from modelutil import load_model
@@ -12,12 +12,11 @@ def get_file_extension(file_path):
     return file_extension
     
 def convert_mp4_to_mpg(input_file, output_file):
-    try:
-        # Run ffmpeg command
-        subprocess.run(['ffmpeg', '-i', input_file, output_file], check=True)
-        print(f"Conversion successful: {output_file}")
-    except subprocess.CalledProcessError as e:
-        print(f"Error during conversion: {e}")
+    # Load the video file
+    video = VideoFileClip(input_file)
+    
+    # Write the video file in mpg format
+    video.write_videofile(output_file, codec='mpeg2video')
 # Set the layout to the streamlit app as wide 
 st.set_page_config(layout='wide')
 
