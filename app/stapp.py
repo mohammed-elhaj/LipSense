@@ -9,7 +9,7 @@ from modelutil import load_model
 st.set_page_config(layout='wide')
 # Setup the sidebar
 with st.sidebar: 
-    st.image('https://www.onepointltd.com/wp-content/uploads/2020/03/inno2.png')
+    st.image('https://play.google.com/store/apps/details?id=digital.dong.lipreading&hl=en_US')
     st.title('LipBuddy')
     st.info('This application is originally developed from the LipNet deep learning model.')
 st.title('LipNet Full Stack App') 
