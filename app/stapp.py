@@ -11,7 +11,7 @@ st.set_page_config(layout='wide')
 with st.sidebar: 
     st.image('https://www.onepointltd.com/wp-content/uploads/2020/03/inno2.png')
     st.title('Lip Reader')
-    st.info('This application is originally developed from the LipNet deep learning model.')
+    st.info('An app that enables everyone to have an exceptional communication experience')
 st.title('Anas language ') 
 # Generating a list of options or videos 
 options = os.listdir('app/data/s1')
