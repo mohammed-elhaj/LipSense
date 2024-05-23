@@ -9,10 +9,10 @@ from modelutil import load_model
 st.set_page_config(layout='wide')
 # Setup the sidebar
 with st.sidebar: 
-    st.image('https://play.google.com/store/apps/details?id=digital.dong.lipreading&hl=en_US')
+    st.image('https://www.onepointltd.com/wp-content/uploads/2020/03/inno2.png')
     st.title('LipBuddy')
     st.info('This application is originally developed from the LipNet deep learning model.')
-st.title('LipNet Full Stack App') 
+st.title('Anas languege ') 
 # Generating a list of options or videos 
 options = os.listdir('app/data/s1')
 selected_video = st.selectbox('Choose video', options)
