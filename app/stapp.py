@@ -33,8 +33,11 @@ if options:
 
         script_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
         file_path = os.path.join(script_dir, 'data', 's1', selected_video)
+
+        # Path to the output video
+        output_file_path = os.path.join(script_dir, 'test_video.mp4')
         
-        os.system(f'ffmpeg -i {file_path} -vcodec libx264 test_video.mp4 -y')
+        os.system(f'ffmpeg -i "{file_path}" -vcodec libx264 "{output_file_path}" -y')
 
         # Rendering inside of the app
         #video = open('app/test_video.mp4', 'rb') 
@@ -43,8 +46,8 @@ if options:
 
 
         # Rendering inside of the app gpt 
-        video_path = os.path.join(script_dir,'test_video.mp4')
-        with open(video_path, 'rb') as video:
+        #video_path = os.path.join(script_dir,'test_video.mp4')
+        with open(output_file_path, 'rb') as video:
             video_bytes = video.read()
         st.video(video_bytes)
 
