@@ -69,7 +69,7 @@ if options:
 
         st.info('This is the output of the machine learning model as tokens')
        # if get_file_extension(file_path) == 'mp4':
-        output_file_path = os.path.join(script_dir, '20240523_160349.mp4')
+        output_file_path = os.path.join(script_dir, 'test_video.mpg')
         #convert_mp4_to_mpg(file_path, output_file_path)
         video, annotations = load_data(tf.convert_to_tensor(output_file_path))
         model = load_model()
