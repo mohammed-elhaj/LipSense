@@ -6,6 +6,7 @@ from moviepy.editor import VideoFileClip
 import tensorflow as tf 
 from utils import load_data, num_to_char
 from modelutil import load_model
+import tempfile
 
 def get_file_extension(file_path):
     _, file_extension = os.path.splitext(file_path)
@@ -28,32 +29,35 @@ with st.sidebar:
 
 st.title('LipNet Full Stack App') 
 # Generating a list of options or videos 
+script_dir = os.path.dirname(os.path.abspath(__file__))
+uploaded_video = st.file_uploader("Upload a video", type=["mp4"])
 options = os.listdir('app/data/s1')
 selected_video = st.selectbox('Choose video', options)
+video_path= ""
+
+if uploaded_video:
+    uploaded_video_path = ""
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp_file:
+        tmp_file.write(uploaded_video.read())
+        uploaded_video_path = tmp_file.name
+    video_path = os.path.join(tempfile.gettempdir(), 'converted_video.mpg')
+    os.system(f'ffmpeg -i "{uploaded_video_path}" -vcodec mpeg2video "{video_path}" -y')
+else:
+    video_path = os.path.join(script_dir, 'data', 's1', selected_video)
 
 # Generate two columns 
 col1, col2 = st.columns(2)
 
-if options: 
+if video_path: 
 
     # Rendering the video 
     with col1: 
         st.info('The video below displays the converted video in mp4 format')
-        #file_path = os.path.join('..','data','s1', selected_video)
-
-        script_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
-        file_path = os.path.join(script_dir, 'data', 's1', selected_video)
-
+        
         # Path to the output video
         output_file_path = os.path.join(script_dir, 'test_video.mp4')
         
-        os.system(f'ffmpeg -i "{file_path}" -vcodec libx264 "{output_file_path}" -y')
-
-        # Rendering inside of the app
-        #video = open('app/test_video.mp4', 'rb') 
-        #video_bytes = video.read() 
-        #st.video(video_bytes)
-
+        os.system(f'ffmpeg -i "{video_path}" -vcodec libx264 "{output_file_path}" -y')
 
         # Rendering inside of the app gpt 
         #video_path = os.path.join(script_dir,'test_video.mp4')
@@ -70,8 +74,8 @@ if options:
         st.info('This is the output of the machine learning model as tokens')
        # if get_file_extension(file_path) == 'mp4':
         output_file_path = os.path.join(script_dir, 'test_video.mpg')
-        #convert_mp4_to_mpg(file_path, output_file_path)
-        video, annotations = load_data(tf.convert_to_tensor(output_file_path))
+        convert_mp4_to_mpg(video_path, output_file_path)
+        video, annotations = load_data(tf.convert_to_tensor(video_path))
         model = load_model()
         yhat = model.predict(tf.expand_dims(video, axis=0))
         decoder = tf.keras.backend.ctc_decode(yhat, [75], greedy=True)[0][0].numpy()
