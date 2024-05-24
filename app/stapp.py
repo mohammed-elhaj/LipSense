@@ -36,11 +36,10 @@ selected_video = st.selectbox('Choose video', options)
 video_path= ""
 
 if uploaded_video:
-    uploaded_video_path = ""
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp_file:
         tmp_file.write(uploaded_video.read())
         uploaded_video_path = tmp_file.name
-    video_path = os.path.join(tempfile.gettempdir(), 'converted_video.mpg')
+    video_path = os.path.join(tempfile.gettempdir(), 'uploaded_video.mpg')
     os.system(f'ffmpeg -i "{uploaded_video_path}" -vcodec mpeg2video "{video_path}" -y')
 else:
     video_path = os.path.join(script_dir, 'data', 's1', selected_video)
@@ -75,7 +74,7 @@ if video_path:
        # if get_file_extension(file_path) == 'mp4':
         output_file_path = os.path.join(script_dir, 'test_video.mpg')
         convert_mp4_to_mpg(video_path, output_file_path)
-        video, annotations = load_data(tf.convert_to_tensor(video_path))
+        video, annotations = load_data(tf.convert_to_tensor(output_file_path))
         model = load_model()
         yhat = model.predict(tf.expand_dims(video, axis=0))
         decoder = tf.keras.backend.ctc_decode(yhat, [75], greedy=True)[0][0].numpy()
