@@ -38,6 +38,7 @@ def crop_mouth(frame):
 def load_video(path: str) -> List[float]:
     cap = cv2.VideoCapture(path)
     frames = []
+    cropped_frames = []
     for i in range(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))):
         ret, frame = cap.read()
         if not ret or i >= 75:
@@ -45,11 +46,12 @@ def load_video(path: str) -> List[float]:
         cropped_frame = crop_mouth(frame)
         frame = tf.image.rgb_to_grayscale(cropped_frame)
         frames.append(frame)
+        cropped_frames.append(cropped_frame)  # Keep cropped frame for debugging/visualization
     cap.release()
     
     mean = tf.math.reduce_mean(frames)
     std = tf.math.reduce_std(tf.cast(frames, tf.float32))
-    return tf.cast((frames - mean), tf.float32) / std
+    return tf.cast((frames - mean), tf.float32) / std, cropped_frames
 
 def load_data(path: tf.Tensor) -> List[float]:
     path = bytes.decode(path.numpy())
@@ -57,5 +59,5 @@ def load_data(path: tf.Tensor) -> List[float]:
     script_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
     video_path = os.path.join(script_dir, 'data', 's1', f'{file_name}.mpg')
     
-    frames = load_video(video_path)
-    return frames
+    frames, cropped_frames = load_video(video_path)
+    return frames, cropped_frames
