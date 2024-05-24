@@ -13,9 +13,9 @@ num_to_char = tf.keras.layers.StringLookup(
 def load_video(path: str) -> List[float]:
     cap = cv2.VideoCapture(path)
     frames = []
-    for _ in range(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))):
+    for i in range(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))):
         ret, frame = cap.read()
-        if not ret:
+        if not ret or i >= 75:
             break
         frame = tf.image.rgb_to_grayscale(frame)
         frames.append(frame[190:236, 80:220, :])
