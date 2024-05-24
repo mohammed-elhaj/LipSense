@@ -61,8 +61,8 @@ if video_path:
         st.info('This is all the machine learning model sees when making a prediction')
         video_data = load_data(tf.convert_to_tensor(video_path))
         gif_path = os.path.join(tempfile.gettempdir(), 'animation.gif')
-        imageio.mimsave(gif_path, video_data[:75], fps=10)
-        st.image(gif_path, width=400)
+        #imageio.mimsave(gif_path, video_data[:75], fps=10)
+        #st.image(gif_path, width=400)
 
         st.info('This is the output of the machine learning model as tokens')
         model = load_model()
