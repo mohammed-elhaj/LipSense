@@ -27,9 +27,13 @@ selected_video = st.selectbox('Or choose a sample video', data_options)
 
 # Use uploaded video if available
 if uploaded_video:
-    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp_file:
         tmp_file.write(uploaded_video.read())
-        video_path = tmp_file.name
+        uploaded_video_path = tmp_file.name
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    video_path = os.path.join(tempfile.gettempdir(), 'converted_video.mpg')
+    os.system(f'ffmpeg -i "{uploaded_video_path}" -vcodec mpeg2video "{video_path}" -y')
 else:
     script_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
     video_path = os.path.join(script_dir, 'data', 's1', selected_video)
@@ -57,12 +61,12 @@ if video_path:
         st.info('This is all the machine learning model sees when making a prediction')
         video_data, annotations = load_data(tf.convert_to_tensor(video_path))
         gif_path = os.path.join(tempfile.gettempdir(), 'animation.gif')
-        imageio.mimsave(gif_path, video_data, fps=10)
+        imageio.mimsave(gif_path, video_data[:75], fps=10)
         st.image(gif_path, width=400)
 
         st.info('This is the output of the machine learning model as tokens')
         model = load_model()
-        yhat = model.predict(tf.expand_dims(video_data, axis=0))
+        yhat = model.predict(tf.expand_dims(video_data[:75], axis=0))
         decoder = tf.keras.backend.ctc_decode(yhat, [75], greedy=True)[0][0].numpy()
         st.text(decoder)
 
@@ -71,11 +75,17 @@ if video_path:
         converted_prediction = tf.strings.reduce_join(num_to_char(decoder)).numpy().decode('utf-8')
         st.text(converted_prediction)
         
-       # Adding model interpretation details
+        # Adding model interpretation details
         st.info('Model confidence scores and other details')
         # Assuming yhat contains logits, we can apply a softmax to get probabilities
         confidence_scores = tf.nn.softmax(yhat[0]).numpy()
-        st.bar_chart(confidence_scores)
+        
+        # Display top-N predictions
+        top_n = 5
+        top_n_indices = confidence_scores.argsort()[-top_n:][::-1]
+        for i in top_n_indices:
+            score = confidence_scores[i]
+            st.write(f"Token {i}: {num_to_char([i])[0].numpy().decode('utf-8')} with confidence {score:.2%}")
 
 # Enhancements for user experience and performance
 st.info('Enhancements for better performance and user experience')
