@@ -84,7 +84,7 @@ if video_path:
         top_n = 5
         top_n_indices = confidence_scores.argsort()[-top_n:][::-1]
         for i in top_n_indices:
-            char = num_to_char([i])[0].numpy().decode('utf-8')
+            char = num_to_char([i]).numpy()[0].decode('utf-8')
             score = confidence_scores[i]
             st.write(f"Token {i}: {char} with confidence {score:.2%}")
 
