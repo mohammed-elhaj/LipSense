@@ -48,7 +48,7 @@ def load_data(path: str):
     video_path = os.path.join(script_dir, 'data', 's1', f'{file_name}.mpg')
     alignment_path = os.path.join(script_dir, 'data', 'alignments', 's1', f'{file_name}.align')
     
-    frames = load_video(video_path) 
+    frames = load_video(path) 
     alignments = '' #load_alignments(alignment_path)
     
     return frames, alignments
