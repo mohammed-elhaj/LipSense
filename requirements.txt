@@ -4,4 +4,3 @@ imageio==2.23.0
 opencv-python-headless
 ffmpeg
 moviepy
-tempfile
